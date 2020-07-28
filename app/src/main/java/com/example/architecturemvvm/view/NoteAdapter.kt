@@ -1,17 +1,16 @@
 package com.example.architecturemvvm.view
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.architecturemvvm.R
 import com.example.architecturemvvm.room.Note
+import androidx.recyclerview.widget.ListAdapter
 
-
-class NoteAdapter internal constructor(context: Context)
-    : RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
+class NoteAdapter: ListAdapter<Note, NoteAdapter.ViewHolder>(DiffCallback()) {
 
     private var notes = emptyList<Note>()
     private var listener: OnItemClickListener? = null
@@ -31,6 +30,19 @@ class NoteAdapter internal constructor(context: Context)
         }
     }
 
+    class DiffCallback : DiffUtil.ItemCallback<Note>() {
+        override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+//            return oldItem == newItem
+            return oldItem.title == newItem.title &&
+                    oldItem.description == newItem.description &&
+                    oldItem.priority == newItem.priority
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteAdapter.ViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
@@ -45,7 +57,6 @@ class NoteAdapter internal constructor(context: Context)
         holder.textViewPriority.text = current.priority.toString()
         holder.textViewTitle.text = current.title
         holder.textViewDescription.text = current.description
-//        holder.bind(current, itemClickListener)
     }
 
     internal fun setNotes(notes: List<Note>) {
